@@ -1,6 +1,6 @@
 This is a Python program which can be used to do some limited management of a 3G USB Modem on Linux, allowing the user to send SMS messages, send USSD commands, and send AT command to the modem. There are two interfaces the command line version and the curses interface.
 
-This has only been tested on Xubuntu 12.04.
+Python version is 2.7.3. This has only been tested on Xubuntu 12.04. The project is still very much a work in progress.
 
 To install, run the command:
     sudo ./install.sh
