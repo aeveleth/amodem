@@ -1,0 +1,205 @@
+#!/usr/bin/env python
+
+# Python Library Imports
+import sys
+import os
+
+# Modem Project Imports
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)) + '/../lib/amodem'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)) + '/../lib'))
+import modemcmds
+import settings
+import errors
+import logger
+import curses_main
+
+class Modem:
+    def __init__(self):
+        self.InitializeSerialPort = True
+        self.ExitAfterRun         = False
+        self.RunCursesInterface   = False
+        self.CursesInterface      = curses_main.CursesInterface()
+        self.ModemCommands        = modemcmds.Commands()
+        self.ModemSettings        = settings.Settings()
+        self.Logger               = logger.Logger()
+    # end __init__
+
+    optionsHelp = [
+            '-c or --config <file name>\n    Load the given configuration file.',
+            '-h or --help <options,commands>\n    Display help.',
+            '-d or --debug\n    Print debug information.',
+            '-p or --provider <provider>\n    Set the phone provider for the session.',
+            '-s or --serial-port <port>\n    Set the serial port (/dev/tty), overrides what is in the configuration file.',
+            '-o or --do-not-initialize\n    Do not attempt to initialize the serial port for AT commands.',
+            '-l or --enable-logging <log file>\n    Enable logging of all commands to \'~/.amodem.log\' or to given file.',
+            '-x or --exit-after-run\n    Will run one command then exit.',
+            '-i or --curses\n    Run the curses interface.',
+            ]
+
+    # load the config file specified on the command line
+    # returns the argList without the config file
+    def configOption(self, argv):
+        argv.pop(0)
+        if len(argv) > 0 and argv[0][0] != '-':
+            self.ModemSettings.SetConfigFileName(argv.pop(0))
+        else:
+            self.Logger.LogMessage('No Config File Given - Using Default', logger.MSG_TYPES.STDOUT)
+        # end if
+    # end configOption
+
+    # print help then exit the program
+    def helpOption(self, argv):
+        argv.pop(0)
+        self.Logger.LogMessage('amodem [Options] [Command [Command Parameters]]\n', logger.MSG_TYPES.STDOUT)
+        if len(argv) > 0:
+            toPrint = argv.pop(0)
+            if toPrint == 'options':
+                self.printOptions()
+                exit(errors.NO_ERROR)
+            elif toPrint == 'commands':
+                self.ModemCommands.PrintCommandsHelp()
+                exit(errors.NO_ERROR)
+            # end if
+        else:
+            self.printOptions()
+            self.Logger.LogMessage('', logger.MSG_TYPES.STDOUT)
+            self.ModemCommands.PrintCommandsHelp()
+            exit(errors.NO_ERROR)
+        # end if
+    # end helpOption
+
+    def printOptions(self):
+        self.Logger.LogMessage('Options:', logger.MSG_TYPES.STDOUT)
+        for o in self.optionsHelp:
+            self.Logger.LogMessage(o, logger.MSG_TYPES.STDOUT)
+        # end for
+    # end printOptions
+
+    # set DebuggingEnabled to True
+    def debugOption(self, argv):
+        self.Logger.LogMessage('Enabling Debugging', logger.MSG_TYPES.STDOUT)
+        self.Logger.DebuggingEnabled = True
+        argv.pop(0)
+    # end debugOption
+
+    # save the phone provider given to be used in commands
+    def providerOption(self, argv):
+        argv.pop(0)
+        if len(argv) > 0 and argv[0][0] != '-':
+            self.ModemSettings.SetCurrentProvider(argv.pop(0))
+        else:
+            self.Logger.LogMessage('No Provider Given', logger.MSG_TYPES.STDOUT)
+        # end if
+    # end providerOption
+
+    # set InitializeSerialPort to False
+    def doNotInitializeOption(self, argv):
+        self.InitializeSerialPort = False
+        argv.pop(0)
+    # end doNotInitializeOption
+
+    # save the serial port given
+    def serialPortOption(self, argv):
+        argv.pop(0)
+        if len(argv) > 0 and argv[0][0] != '-':
+            self.ModemSettings.SetGeneralSetting('ttyport', argv.pop(0))
+        else:
+            self.Logger.LogMessage('No Serial Port Given', logger.MSG_TYPES.STDOUT)
+        # end if
+    # end serialPortOption
+    
+    # set LoggingEnabled to True
+    # if a file name is given, set the LogFileName
+    def enableLoggingOption(self, argv):
+        self.Logger.LoggingEnabled = True
+        argv.pop(0)
+        if len(argv) > 0 and argv[0][0] != '-':
+            self.Logger.SetLogFileName(argv.pop(0))
+        # end if
+    # end enableLoggingOption
+
+    def exitAfterRunOption(self, argv):
+        self.Logger.LogMessage('Exiting After Running Command', logger.MSG_TYPES.DEBUG)
+        self.ExitAfterRun = True
+        argv.pop(0)
+    # end exitAfterRunOption
+
+    def cursesInterfaceOption(self, argv):
+        self.Logger.LogMessage('Starting Curses Interface', logger.MSG_TYPES.DEBUG)
+        self.RunCursesInterface = True
+        argv.pop(0)
+    # end cursesInterfaceOption
+
+    options = {
+            '-c'                  : configOption,
+            '--config'            : configOption,
+            '-h'                  : helpOption,
+            '--help'              : helpOption,
+            '-d'                  : debugOption,
+            '--debug'             : debugOption,
+            '-p'                  : providerOption,
+            '--provider'          : providerOption,
+            '-s'                  : serialPortOption,
+            '--serial-port'       : serialPortOption,
+            '-o'                  : doNotInitializeOption,
+            '--do-not-initialize' : doNotInitializeOption,
+            '-l'                  : enableLoggingOption,
+            '--enable-logging'    : enableLoggingOption,
+            '-x'                  : exitAfterRunOption,
+            '--exit-after-run'    : exitAfterRunOption,
+            '-i'                  : cursesInterfaceOption,
+            '--curses'            : cursesInterfaceOption,
+            }
+        
+    def Initialize(self):
+        self.Logger.Initialize()
+
+        self.ModemSettings.Logger = self.Logger
+        self.ModemSettings.LoadConfigFile()
+
+        if self.RunCursesInterface:
+            self.CursesInterface.Initialize(self.Logger, self.ModemSettings, self.InitializeSerialPort)
+        else:
+            self.ModemCommands.Initialize(self.Logger, self.ModemSettings, self.InitializeSerialPort)
+        # end if
+    # end Initialize
+
+    def main(self, argv):
+        if len(argv) > 0:
+            while len(argv) > 0 and argv[0] in self.options.keys():
+                self.options[argv[0]](self, argv)
+            # end while
+        # end if
+
+        self.Initialize()
+
+        if self.RunCursesInterface:
+            self.CursesInterface.main()
+        else:
+            cmdAndArgs = self.ModemCommands.GetCommand(argv)
+
+            # run command
+            self.ModemCommands.RunCommand(cmdAndArgs)
+            if self.ExitAfterRun:
+                self.Logger.LogMessage('Exiting...', logger.MSG_TYPES.STDOUT)
+                exit(errors.NO_ERROR)
+            # end if
+
+            while True:
+                cmdAndArgs = self.ModemCommands.GetCommand()
+                self.ModemCommands.RunCommand(cmdAndArgs)
+            # end while
+        # end if
+    # end main
+# end Modem
+
+try:
+    if __name__ == '__main__':
+        modem = Modem()
+        modem.main(sys.argv[1:])
+except KeyboardInterrupt:
+    pass
+except SystemExit:
+    pass
+except:
+    print 'Main Error\n', sys.exc_info()[1]
