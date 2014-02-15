@@ -1,6 +1,17 @@
-This is a Python program which can be used to do some limited management of a 3G USB Modem on Linux, allowing the user to send SMS messages, send USSD commands, and send AT command to the modem. There are two interfaces the command line version and the curses interface.
+This is a Python program which can be used to do some limited management of a 3G USB Modem on Linux, allowing the user to send SMS messages, send USSD commands, and send AT command to the modem. There are two interfaces the command line version and the curses interface (implemented using the Python Urwid module).
 
-Python version is 2.7.3. This has only been tested on Xubuntu 12.04. The project is still very much a work in progress.
+Tested with Python versions 2.7.3 and 2.7.4 on Xubuntu 12.04 and Fedora 20.
+
+Dependencies are:
+    python-urwid
+    pyusb
+    pyserial
+On Ubuntu/Debian:
+    sudo apt-get install python-urwid pyusb pyserial
+On Fedora:
+    sudo yum install python-urwid pyusb pyserial
+
+The project is still very much a work in progress.
 
 To install, run the command:
     sudo ./install.sh

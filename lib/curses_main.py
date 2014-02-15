@@ -21,8 +21,6 @@ class CursesInterface:
         MenuRoot.ModemSettings = ModemSettings
         if InitSerialPort:
             InitializeSerialPortDialog().main()
-            #d = InitializeSerialPortDialog()
-            #d.main()
         # end if
     # end Initialize
 

@@ -55,7 +55,7 @@ class GeneralSettingsItem(MenuDisplay):
         index = MenuRoot.ModemSettings.GeneralSettingsNames[self.caption]
         currentSetting = MenuRoot.ModemSettings.GeneralSettings[index]
         self.content.set_edit_text(currentSetting)
-        self.content.set_edit_pos(len(currentSetting))
+        #self.content.set_edit_pos(len(currentSetting))
         super(GeneralSettingsItem, self).open_menu(box)
     # end open_menu
 
@@ -86,7 +86,7 @@ class ProviderSettingsItem(MenuDisplay):
         index = MenuRoot.ModemSettings.ProviderSettingList.index(name)
         currentSetting = MenuRoot.ModemSettings.Providers[self.provider][index]
         self.content.set_edit_text(currentSetting)
-        self.content.set_edit_pos(len(currentSetting))
+        #self.content.set_edit_pos(len(currentSetting))
         super(ProviderSettingsItem, self).open_menu(box)
     # end open_menu
 
@@ -111,7 +111,7 @@ class CurrentProvider(MenuDisplay):
     def open_menu(self, box):
         currentProvider = MenuRoot.ModemSettings.GetCurrentProvider()
         self.content.set_edit_text(currentProvider)
-        self.content.set_edit_pos(len(currentProvider))
+        #self.content.set_edit_pos(len(currentProvider))
         super(CurrentProvider, self).open_menu(box)
     # end open_menu
 
@@ -136,7 +136,7 @@ class SaveSettings(MenuDisplay):
     def open_menu(self, box):
         configFile = MenuRoot.ModemSettings.GetConfigFileName()
         self.content.set_edit_text(configFile)
-        self.content.set_edit_pos(len(configFile))
+        #self.content.set_edit_pos(len(configFile))
         super(SaveSettings, self).open_menu(box)
     # end open_menu
 
@@ -162,7 +162,7 @@ class LoadConfigFile(MenuDisplay):
     def open_menu(self, box):
         configFile = MenuRoot.ModemSettings.GetConfigFileName()
         self.content.set_edit_text(configFile)
-        self.content.set_edit_pos(len(configFile))
+        #self.content.set_edit_pos(len(configFile))
         super(LoadConfigFile, self).open_menu(box)
     # end open_menu
 

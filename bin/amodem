@@ -11,17 +11,24 @@ import modemcmds
 import settings
 import errors
 import logger
-import curses_main
+
+# removed the import from here
+# curses_main is only imported if it is required
+#import curses_main 
 
 class Modem:
     def __init__(self):
         self.InitializeSerialPort = True
         self.ExitAfterRun         = False
         self.RunCursesInterface   = False
-        self.CursesInterface      = curses_main.CursesInterface()
         self.ModemCommands        = modemcmds.Commands()
         self.ModemSettings        = settings.Settings()
         self.Logger               = logger.Logger()
+
+        # removed initialization from here
+        # curses_main has not been imported yet
+        # CursesInterface is only initialized if it is required
+        #self.CursesInterface      = curses_main.CursesInterface()
     # end __init__
 
     optionsHelp = [
@@ -127,6 +134,8 @@ class Modem:
     def cursesInterfaceOption(self, argv):
         self.Logger.LogMessage('Starting Curses Interface', logger.MSG_TYPES.DEBUG)
         self.RunCursesInterface = True
+        import curses_main
+        self.CursesInterface = curses_main.CursesInterface()
         argv.pop(0)
     # end cursesInterfaceOption
 

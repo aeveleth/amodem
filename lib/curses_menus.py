@@ -74,6 +74,14 @@ class EditContent(urwid.Edit):
         self.callback_caption[0] = ''
     # end remove_callback
 
+    def set_edit_text(self, text):
+        if text == None:
+            text = ''
+        # end if
+        super(EditContent, self).set_edit_text(text)
+        self.set_edit_pos(len(text))
+    # end set_edit_text
+
 # end EditContent
 
 class MenuButton(urwid.Button):

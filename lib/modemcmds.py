@@ -107,6 +107,7 @@ class Commands:
                     userInput = self.Logger.LogInput('Continue Without Initializing Serial Port (yes/no): ')
                 # end if
             # end while
+            print
         # end if
     # end InitializeSerialPort
 
