@@ -8,10 +8,6 @@ import string
 import re
 import subprocess
 
-# PyUSB Library
-import usb.core
-import usb.util
-
 # Modem Project Imports
 import atcodes
 import logger
